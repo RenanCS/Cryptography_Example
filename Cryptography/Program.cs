@@ -24,7 +24,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<IOMiddleware>();
-app.UseMiddleware<IOSimpleMiddleware>();
 
 app.Use(async (context, next) =>
 {
