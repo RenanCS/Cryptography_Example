@@ -14,7 +14,7 @@ namespace Cryptography.Library
 
         public byte[] Encrypt(string dataToEncrypt)
         {
-            return rsa.Encrypt(Encoding.UTF8.GetBytes(dataToEncrypt), RSAEncryptionPadding.OaepSHA256);
+            return rsa.Encrypt(Encoding.UTF8.GetBytes(dataToEncrypt), RSAEncryptionPadding.Pkcs1);
         }
 
         public byte[] Encrypt(byte[] dataToEncrypt)
@@ -24,7 +24,7 @@ namespace Cryptography.Library
 
         public byte[] Decrypt(byte[] dataToDecrypt)
         {
-            return rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256);
+            return rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.Pkcs1);
         }
 
         public byte[] ExportPrivateKey(int numberOfIterations, string password)
