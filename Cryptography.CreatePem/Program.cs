@@ -2,6 +2,8 @@
 using Cryptography.CreatePem.Helper;
 using Cryptography.Library;
 using Cryptography.Library.Helper;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Program
 {
@@ -20,8 +22,8 @@ namespace Program
                 FileHelper.StringToFile(pathPrivateKey, WriteReadKey.ExportPrivateKey(rsaParams.rsa));
             }
 
-            WriteReadKey.GetPrivateKeyFromPemFile(pathPrivateKey, rsaParams.rsa);
             WriteReadKey.GetPublicKeyFromPemFile(pathPublicKey, rsaParams.rsa);
+            WriteReadKey.GetPrivateKeyFromPemFile(pathPrivateKey, rsaParams.rsa);
         }
     }
 }
