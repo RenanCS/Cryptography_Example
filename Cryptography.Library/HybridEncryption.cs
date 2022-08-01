@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using System.Text;
 
 namespace Cryptography.Library
 {
@@ -20,10 +21,11 @@ namespace Cryptography.Library
             // Create AES session key.
             var sessionKey = GenerateRandomNumber(32);
             var Iv = GenerateRandomNumber(12);
+            var additionalData = Encoding.UTF8.GetBytes("teste_adicional_info");
 
             // Encrypt data with AES-GCM
             (byte[] ciphereText, byte[] tag) encrypted =
-                _aes.Encrypt(original, sessionKey, Iv, null);
+                _aes.Encrypt(original, sessionKey, Iv, additionalData);
 
 
             var encryptedPacket = new EncryptedPacket
@@ -52,12 +54,12 @@ namespace Cryptography.Library
         public byte[] DecryptData(EncryptedPacket encryptedPacket, NewRSA rsaParams,
                                   NewDigitalSignature digitalSignature)
         {
-
+            var additionalData = Encoding.UTF8.GetBytes("teste_adicional_info");
             var decryptedData = _aes.Decrypt(Convert.FromBase64String(encryptedPacket.EncryptedData),
                                              Convert.FromBase64String(encryptedPacket.EncryptedSessionKey),
                                              Convert.FromBase64String(encryptedPacket.Iv),
                                              Convert.FromBase64String(encryptedPacket.Tag),
-                                             null);
+                                             additionalData);
 
             return decryptedData;
         }
