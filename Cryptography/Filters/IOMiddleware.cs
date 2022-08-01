@@ -36,8 +36,8 @@ namespace Cryptography.Filters
 
                 if (!string.IsNullOrEmpty(body))
                 {
-                    //var newBody = DecryptBlockWithouKey(body);
-                    var newBody = DecryptBlockSimple(body);
+                    var newBody = DecryptBlockWithouKey(body);
+                    //var newBody = DecryptBlockSimple(body);
 
                     request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newBody));
                     request.Headers.ContentType = "application/json";
@@ -73,8 +73,8 @@ namespace Cryptography.Filters
                 {
                     string body = await bufferReader.ReadToEndAsync();
 
-                    //newBody = EncryptStreamWhitouKey(body);
-                    newBody = EncryptStreamSimple(body);
+                    newBody = EncryptStreamWhitouKey(body);
+                    //newBody = EncryptStreamSimple(body);
 
                     //reset read to start of stream
                     buffer.Seek(0, SeekOrigin.Begin);

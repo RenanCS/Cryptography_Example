@@ -5,15 +5,15 @@ namespace Cryptography.Library
     public class AesGCMEncryption
     {
 
-        public (byte[], byte[]) Encrypt(byte[] dataToEncrypt, byte[] key, byte[] nonce, byte[] associatedData)
+        public (byte[], byte[]) Encrypt(byte[] dataToEncrypt, byte[] sessionKey, byte[] Iv, byte[] associatedData)
         {
             // these will be filled during the encryption
             byte[] tag = new byte[16];
             byte[] ciphertext = new byte[dataToEncrypt.Length];
 
-            using (AesGcm aesGcm = new AesGcm(key))
+            using (AesGcm aesGcm = new AesGcm(sessionKey))
             {
-                aesGcm.Encrypt(nonce, dataToEncrypt, ciphertext, tag, associatedData);
+                aesGcm.Encrypt(Iv, dataToEncrypt, ciphertext, tag, associatedData);
             }
 
             return (ciphertext, tag);
