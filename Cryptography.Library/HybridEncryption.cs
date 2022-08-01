@@ -19,30 +19,32 @@ namespace Cryptography.Library
         {
             // Create AES session key.
             var sessionKey = GenerateRandomNumber(32);
-
-            var encryptedPacket = new EncryptedPacket
-            {
-                Iv = GenerateRandomNumber(12)
-            };
+            var Iv = GenerateRandomNumber(12);
 
             // Encrypt data with AES-GCM
             (byte[] ciphereText, byte[] tag) encrypted =
-                _aes.Encrypt(original, sessionKey, encryptedPacket.Iv, null);
+                _aes.Encrypt(original, sessionKey, Iv, null);
 
-            encryptedPacket.EncryptedData = encrypted.ciphereText;
 
-            encryptedPacket.Tag = encrypted.tag;
+            var encryptedPacket = new EncryptedPacket
+            {
+                Tag = Convert.ToBase64String(encrypted.tag),
+                EncryptedData = Convert.ToBase64String(encrypted.ciphereText),
+                Iv = Convert.ToBase64String(Iv),
+                EncryptedSessionKey = Convert.ToBase64String(sessionKey)
 
-            // Dica => Criptografa a session key com chave pública de quem disponibilizou
-            encryptedPacket.EncryptedSessionKey = rsaParams.Encrypt(sessionKey);
+            };
 
-            encryptedPacket.SignatureHMAC =
-                ComputeHMACSha256(
-                    Combine(encryptedPacket.EncryptedData, encryptedPacket.Iv),
-                    sessionKey);
+            //// Dica => Criptografa a session key com chave pública de quem disponibilizou
+            //encryptedPacket.EncryptedSessionKey = rsaParams.Encrypt(sessionKey);
 
-            encryptedPacket.Signature =
-                digitalSignature.SignData(encryptedPacket.SignatureHMAC);
+            //encryptedPacket.SignatureHMAC =
+            //    ComputeHMACSha256(
+            //        Combine(encryptedPacket.EncryptedData, encryptedPacket.Iv),
+            //        sessionKey);
+
+            //encryptedPacket.Signature =
+            //    digitalSignature.SignData(encryptedPacket.SignatureHMAC);
 
             return encryptedPacket;
         }
@@ -50,32 +52,11 @@ namespace Cryptography.Library
         public byte[] DecryptData(EncryptedPacket encryptedPacket, NewRSA rsaParams,
                                   NewDigitalSignature digitalSignature)
         {
-            // Dica => Descriptografar a session key com a chave privada
-            var decryptedSessionKey =
-                rsaParams.Decrypt(encryptedPacket.EncryptedSessionKey);
 
-            byte[] newHMAC = ComputeHMACSha256(
-                Combine(encryptedPacket.EncryptedData, encryptedPacket.Iv),
-                decryptedSessionKey);
-
-            if (!Compare(encryptedPacket.SignatureHMAC, newHMAC))
-            {
-                throw new CryptographicException(
-                    "HMAC for decryption does not match encrypted packet.");
-            }
-
-            if (!digitalSignature.VerifySignature(
-                                                encryptedPacket.Signature,
-                                                encryptedPacket.SignatureHMAC))
-            {
-                throw new CryptographicException(
-                    "Digital Signature can not be verified.");
-            }
-
-            var decryptedData = _aes.Decrypt(encryptedPacket.EncryptedData,
-                                             decryptedSessionKey,
-                                             encryptedPacket.Iv,
-                                             encryptedPacket.Tag,
+            var decryptedData = _aes.Decrypt(Convert.FromBase64String(encryptedPacket.EncryptedData),
+                                             Convert.FromBase64String(encryptedPacket.EncryptedSessionKey),
+                                             Convert.FromBase64String(encryptedPacket.Iv),
+                                             Convert.FromBase64String(encryptedPacket.Tag),
                                              null);
 
             return decryptedData;

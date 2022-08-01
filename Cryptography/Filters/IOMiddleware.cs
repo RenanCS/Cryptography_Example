@@ -36,7 +36,7 @@ namespace Cryptography.Filters
 
                 if (!string.IsNullOrEmpty(body))
                 {
-                    //var newBody = DecryptBlock(body);
+                    //var newBody = DecryptBlockWithouKey(body);
                     var newBody = DecryptBlockSimple(body);
 
                     request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newBody));
@@ -73,7 +73,7 @@ namespace Cryptography.Filters
                 {
                     string body = await bufferReader.ReadToEndAsync();
 
-                    //newBody = EncryptStream(body);
+                    //newBody = EncryptStreamWhitouKey(body);
                     newBody = EncryptStreamSimple(body);
 
                     //reset read to start of stream
@@ -95,7 +95,7 @@ namespace Cryptography.Filters
             return newBody;
         }
 
-        private static string EncryptStream(string original)
+        private static string EncryptStreamWhitouKey(string original)
         {
             var encryptedBlock = hybrid.EncryptData(Encoding.UTF8.GetBytes(original), rsaParams, digitalSignature);
             var encryptedBlockJson = JsonConvert.SerializeObject(encryptedBlock);
@@ -109,7 +109,7 @@ namespace Cryptography.Filters
             return encryptedBlockJson;
         }
 
-        private static string DecryptBlock(string responseBody)
+        private static string DecryptBlockWithouKey(string responseBody)
         {
             EncryptedPacket encryptedBlock = JsonConvert.DeserializeObject<EncryptedPacket>(responseBody);
             var decrpyted = hybrid.DecryptData(encryptedBlock, rsaParams, digitalSignature);
@@ -124,6 +124,8 @@ namespace Cryptography.Filters
             var decrpytedString = Encoding.UTF8.GetString(decrpyted);
             return decrpytedString;
         }
+
+
 
         private void CheckKey()
         {

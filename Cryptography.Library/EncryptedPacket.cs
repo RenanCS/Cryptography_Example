@@ -3,14 +3,14 @@
     public class EncryptedPacket
     {
         // Sessão criada criptografada com a chave pública
-        public byte[] EncryptedSessionKey { get; set; }
-        public byte[] EncryptedData { get; set; }
+        public string EncryptedSessionKey { get; set; }
+        public string EncryptedData { get; set; }
         // Iv sinônimos para NONCE
-        public byte[] Iv { get; set; }
+        public string Iv { get; set; }
         // Tag equivale ao HMAC original 
-        public byte[] Tag { get; set; }
+        public string Tag { get; set; }
         // Armazena a hash autenticado do dados criptografados (sessionkey + EncryptedData + Iv)
-        public byte[] SignatureHMAC { get; set; }
-        public byte[] Signature { get; set; }
+        public string SignatureHMAC { get; set; }
+        public string Signature { get; set; }
     }
 }
