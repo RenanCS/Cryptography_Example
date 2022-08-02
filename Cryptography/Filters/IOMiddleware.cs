@@ -1,6 +1,4 @@
-﻿using Cryptography.Library;
-using Cryptography.Library.Helper;
-using Newtonsoft.Json;
+﻿using Cryptography.Library.Factory;
 using System.Text;
 
 namespace Cryptography.Filters
@@ -8,15 +6,11 @@ namespace Cryptography.Filters
     public class IOMiddleware
     {
         private readonly RequestDelegate _next;
-
-        private static readonly HybridEncryption hybrid = new HybridEncryption();
-        private static readonly NewRSA rsaParams = new NewRSA();
-        private static readonly NewDigitalSignature digitalSignature = new NewDigitalSignature();
+        private readonly FactoryAes factoryAes = new FactoryAes();
+        private readonly FactoryPubPriKey factoryPubPriKey = new FactoryPubPriKey();
 
         public IOMiddleware(RequestDelegate next)
         {
-            this.CheckKey();
-
             _next = next;
         }
 
@@ -36,8 +30,8 @@ namespace Cryptography.Filters
 
                 if (!string.IsNullOrEmpty(body))
                 {
-                    var newBody = DecryptBlockWithouKey(body);
-                    //var newBody = DecryptBlockSimple(body);
+                    //var newBody = factoryAes.Decrypt(body);
+                    var newBody = factoryPubPriKey.Decrypt(body);
 
                     request.Body = new MemoryStream(Encoding.UTF8.GetBytes(newBody));
                     request.Headers.ContentType = "application/json";
@@ -73,8 +67,8 @@ namespace Cryptography.Filters
                 {
                     string body = await bufferReader.ReadToEndAsync();
 
-                    newBody = EncryptStreamWhitouKey(body);
-                    //newBody = EncryptStreamSimple(body);
+                    //newBody = factoryAes.Encrypt(body);
+                    newBody = factoryPubPriKey.Encrypt(body);
 
                     buffer.Seek(0, SeekOrigin.Begin);
 
@@ -90,53 +84,6 @@ namespace Cryptography.Filters
             }
 
             return newBody;
-        }
-
-        private static string EncryptStreamWhitouKey(string original)
-        {
-            var encryptedBlock = hybrid.EncryptData(Encoding.UTF8.GetBytes(original), rsaParams, digitalSignature);
-            var encryptedBlockJson = JsonConvert.SerializeObject(encryptedBlock);
-            return encryptedBlockJson;
-        }
-
-        private static string EncryptStreamSimple(string original)
-        {
-            var encryptedBlock = rsaParams.Encrypt(original);
-            var encryptedBlockJson = Convert.ToBase64String(encryptedBlock);
-            return encryptedBlockJson;
-        }
-
-        private static string DecryptBlockWithouKey(string responseBody)
-        {
-            EncryptedPacket encryptedBlock = JsonConvert.DeserializeObject<EncryptedPacket>(responseBody);
-            var decrpyted = hybrid.DecryptData(encryptedBlock, rsaParams, digitalSignature);
-            var decrpytedString = Encoding.UTF8.GetString(decrpyted);
-
-            return decrpytedString;
-        }
-
-        private static string DecryptBlockSimple(string responseBody)
-        {
-            var decrpyted = rsaParams.Decrypt(Convert.FromBase64String(responseBody));
-            var decrpytedString = Encoding.UTF8.GetString(decrpyted);
-            return decrpytedString;
-        }
-
-
-
-        private void CheckKey()
-        {
-            string pathPublicKey = "C:\\keys\\public.perm";
-            string pathPrivateKey = "C:\\keys\\private.perm.";
-
-            if (!File.Exists(pathPrivateKey))
-            {
-                throw new Exception("Não foi encontrado as chaves públicas e privadas");
-            }
-
-            // OBS: A importação da chave privada sempre tem que ser a última
-            WriteReadKey.GetPublicKeyFromPemFile(pathPublicKey, rsaParams.rsa);
-            WriteReadKey.GetPrivateKeyFromPemFile(pathPrivateKey, rsaParams.rsa);
         }
     }
 }
