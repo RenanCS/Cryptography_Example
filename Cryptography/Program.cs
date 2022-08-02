@@ -12,8 +12,6 @@ builder.Services.AddSwaggerGen(c =>
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 });
 
-builder.Services.AddScoped<IFileKey, FileKey>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

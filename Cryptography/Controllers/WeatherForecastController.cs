@@ -67,20 +67,5 @@ namespace Cryptography.Controllers
             return Ok(dados);
         }
 
-
-
-        [HttpGet("GetPublicKey")]
-        public async Task<IActionResult> GetPublicKey()
-        {
-            var publicKey = _fileKey.ReaderPublicKey();
-
-            if (string.IsNullOrEmpty(publicKey))
-            {
-                return NotFound();
-            }
-
-            return Ok(publicKey);
-        }
-
     }
 }

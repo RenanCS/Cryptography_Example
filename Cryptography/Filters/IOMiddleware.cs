@@ -137,7 +137,7 @@ namespace Cryptography.Filters
                 throw new Exception("Não foi encontrado as chaves públicas e privadas");
             }
 
-            // OBS: A importação da chave privada sempre tem que ser a última
+            // OBS: A importação da chave privada, sempre tem que ser a última importação
             WriteReadKey.GetPublicKeyFromPemFile(pathPublicKey, rsaParams.rsa);
             WriteReadKey.GetPrivateKeyFromPemFile(pathPrivateKey, rsaParams.rsa);
         }
