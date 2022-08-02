@@ -1,22 +1,29 @@
-﻿using System.Security.Cryptography;
+﻿using Cryptography.Library.Interface;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Cryptography.Library
 {
-    public class HybridEncryption
+    public class HybridEncryption : ICryptography
     {
         private readonly AesGCMEncryption _aes = new AesGCMEncryption();
-
-        public static byte[] ComputeHMACSha256(byte[] toBeHashed, byte[] hmacKey)
+        public string Encrypt(string original)
         {
-            using (var hmacSha256 = new HMACSHA256(hmacKey))
-            {
-                return hmacSha256.ComputeHash(toBeHashed);
-            }
+            var encryptedBlock = EncryptData(Encoding.UTF8.GetBytes(original));
+            var encryptedBlockJson = JsonConvert.SerializeObject(encryptedBlock);
+            return encryptedBlockJson;
         }
 
-        public EncryptedPacket EncryptData(byte[] original, NewRSA rsaParams,
-                                           NewDigitalSignature digitalSignature)
+        public string Decrypt(string data)
+        {
+            EncryptedPacket encryptedBlock = JsonConvert.DeserializeObject<EncryptedPacket>(data);
+            var decrpyted = DecryptData(encryptedBlock);
+            var decrpytedString = Encoding.UTF8.GetString(decrpyted);
+            return decrpytedString;
+        }
+
+        public EncryptedPacket EncryptData(byte[] original)
         {
             var sessionKey = GenerateRandomNumber(32);
             var Iv = GenerateRandomNumber(12);
@@ -33,12 +40,11 @@ namespace Cryptography.Library
                 EncryptedSessionKey = Convert.ToBase64String(sessionKey)
 
             };
-                        
+
             return encryptedPacket;
         }
 
-        public byte[] DecryptData(EncryptedPacket encryptedPacket, NewRSA rsaParams,
-                                  NewDigitalSignature digitalSignature)
+        public byte[] DecryptData(EncryptedPacket encryptedPacket)
         {
             var decryptedData = _aes.Decrypt(Convert.FromBase64String(encryptedPacket.EncryptedData),
                                              Convert.FromBase64String(encryptedPacket.EncryptedSessionKey),
@@ -49,11 +55,13 @@ namespace Cryptography.Library
             return decryptedData;
         }
 
-       
+
 
         public static byte[] GenerateRandomNumber(int length)
         {
             return RandomNumberGenerator.GetBytes(length);
         }
+
+
     }
 }

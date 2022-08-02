@@ -1,23 +1,56 @@
-﻿using System.Security.Cryptography;
+﻿using Cryptography.Library.Helper;
+using Cryptography.Library.Interface;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Cryptography.Library
 {
-    public class NewRSA
+    public class NewRSA : ICryptography
     {
         public RSA rsa;
 
         public NewRSA()
         {
             rsa = RSA.Create(2048);
+
+            CheckKey();
         }
 
-        public byte[] Encrypt(string dataToEncrypt)
+        private void CheckKey()
+        {
+            string pathPublicKey = "C:\\keys\\public.perm";
+            string pathPrivateKey = "C:\\keys\\private.perm.";
+
+            if (!File.Exists(pathPrivateKey))
+            {
+                throw new Exception("Não foi encontrado as chaves públicas e privadas");
+            }
+
+            // OBS: A importação da chave privada sempre tem que ser a última
+            WriteReadKey.GetPublicKeyFromPemFile(pathPublicKey, rsa);
+            WriteReadKey.GetPrivateKeyFromPemFile(pathPrivateKey, rsa);
+        }
+
+        public string Encrypt(string data)
+        {
+            var encryptedBlock = EncryptString(data);
+            var encryptedBlockJson = Convert.ToBase64String(encryptedBlock);
+            return encryptedBlockJson;
+        }
+
+        public string Decrypt(string data)
+        {
+            var decrpyted = Decrypt(Convert.FromBase64String(data));
+            var decrpytedString = Encoding.UTF8.GetString(decrpyted);
+            return decrpytedString;
+        }
+
+        public byte[] EncryptString(string dataToEncrypt)
         {
             return rsa.Encrypt(Encoding.UTF8.GetBytes(dataToEncrypt), RSAEncryptionPadding.OaepSHA256);
         }
 
-        public byte[] Encrypt(byte[] dataToEncrypt)
+        public byte[] EncryptByte(byte[] dataToEncrypt)
         {
             return rsa.Encrypt(dataToEncrypt, RSAEncryptionPadding.OaepSHA256);
         }
@@ -56,5 +89,7 @@ namespace Cryptography.Library
         {
             rsa.ImportSubjectPublicKeyInfo(publicKey, out _);
         }
+
+
     }
 }
