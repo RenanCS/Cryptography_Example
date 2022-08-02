@@ -7,7 +7,6 @@ namespace Cryptography.Library
 
         public (byte[], byte[]) Encrypt(byte[] dataToEncrypt, byte[] sessionKey, byte[] Iv, byte[] associatedData)
         {
-            // these will be filled during the encryption
             byte[] tag = new byte[16];
             byte[] ciphertext = new byte[dataToEncrypt.Length];
 

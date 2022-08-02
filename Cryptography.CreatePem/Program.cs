@@ -2,8 +2,6 @@
 using Cryptography.CreatePem.Helper;
 using Cryptography.Library;
 using Cryptography.Library.Helper;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Program
 {
