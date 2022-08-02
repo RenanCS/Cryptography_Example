@@ -76,13 +76,10 @@ namespace Cryptography.Filters
                     newBody = EncryptStreamWhitouKey(body);
                     //newBody = EncryptStreamSimple(body);
 
-                    //reset read to start of stream
                     buffer.Seek(0, SeekOrigin.Begin);
 
-                    //reset stream
                     buffer.SetLength(0);
 
-                    //copy our content to the original stream and put it back
                     await buffer.CopyToAsync(stream);
                     context.Response.Body = stream;
 

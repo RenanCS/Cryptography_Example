@@ -193,9 +193,7 @@ namespace Cryptography.Library.Helper
             {
                 AsymmetricCipherKeyPair readKeyPair = (AsymmetricCipherKeyPair)new PemReader(privateKeyTextReader).ReadObject();
                 RSAParameters rsaParams = DotNetUtilities.ToRSAParameters((RsaPrivateCrtKeyParameters)readKeyPair.Private);
-                //RSACryptoServiceProvider csp = new RSACryptoServiceProvider();// cspParams);
                 csp.ImportParameters(rsaParams);
-                //return csp;
             }
         }
 
@@ -205,9 +203,7 @@ namespace Cryptography.Library.Helper
             {
                 RsaKeyParameters publicKeyParam = (RsaKeyParameters)new PemReader(publicKeyTextReader).ReadObject();
                 RSAParameters rsaParams = DotNetUtilities.ToRSAParameters((RsaKeyParameters)publicKeyParam);
-                //RSACryptoServiceProvider csp = new RSACryptoServiceProvider();// cspParams);
                 csp.ImportParameters(rsaParams);
-                //return csp;
             }
         }
 
